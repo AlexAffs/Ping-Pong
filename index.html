@@ -61,8 +61,16 @@
             y: 0,
             w: centralLine.w,
             h: 200,
+            speed: 5,
             _move: function(){
-                this.y = ball.y
+                if(this.y + this.h / 2 < ball.y + ball.r){
+                    this.y += this.speed
+                }else{
+                    this.y -=this.speed
+                }
+            },
+            speedUp: function(){
+                this.speed += 4;
             },
             draw: function(){
             //desenha a raquete direita
@@ -144,9 +152,14 @@
             _reverseY: function(){
                 this.directionY *= -1 // same as this.direcionY *= -1
             }, 
+            _speedUp: function(){
+                this.speed += 5
+            },
             _pointUp: function(){
-                this.x = field.w / 2
-                this.y = field.h / 2
+                this.x = field.w / 2;
+                this.y = field.h / 2;
+                this._speedUp();
+                rightRacket.speedUp();
             },         
             _move: function(){
                 this.x += this.directionX * this.speed,
