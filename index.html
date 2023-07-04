@@ -78,8 +78,14 @@
             }
         }
         const score = {
-            human: 1,
-            computer: 2,
+            human: 0,
+            computer: 0,
+            _increaseHuman: function(){
+                this.human ++
+            },
+            _increaseComputer: function(){
+                this.computer ++
+            },
             draw: function(){
             //desenha o placar
             canvasCtx.font = "bold 72px Arial";
@@ -91,13 +97,60 @@
             }
         }
         const ball = {
-            x: 0,
-            y: 0,
+            x: field.w / 2,
+            y: field.h / 2,
             r: 20,
             speed: 5,
+            directionX: 1,
+            directionY: 1,
+            _calcPosition: function() {
+                //Verifica se o jogador 1 fez um ponto (x> que a largura do campo)
+                if(this.x > field.w - this.r - rightRacket.w - gapX){
+                    //verifica se a raquete direita está na posição y da bola
+                    if(this.y + this.r > rightRacket.y && this.y - this.r < rightRacket.y + rightRacket.h){
+                        //rebate a bola invertendo o sinal de x
+                        this._reverseX()
+                    }else{
+                        //pontuar o jogador 1
+                        score._increaseHuman()
+                        this._pointUp()
+                    }
+                }
+                //verifica se o jogar 2 fez um ponto (x < que a largura do campo)
+                if(this.x < this.r + leftRacket.w + gapX){
+                    //verifica se a raquete esquerda está na posição y da bola
+                    if(this.y + this.r > leftRacket.y && this.y - this.r < leftRacket.y + leftRacket.h){
+                        //rebate a bola invertendo o sinal de x
+                        this._reverseX()
+                    }else{
+                        //pontuar o jogador 2
+                        score._increaseComputer()
+                        this._pointUp()
+                    }
+                }
+                //verifica as laterais superior e inferior do campo
+                if(                
+                (this.y > field.h - this.r && this.directionY > 0) ||
+                (this.y - this.r < 0 && this.directionY < 0)
+                )
+                {
+                    this._reverseY()
+                }
+                
+            },
+            _reverseX: function(){
+                this.directionX *= -1
+            },
+            _reverseY: function(){
+                this.directionY *= -1 // same as this.direcionY *= -1
+            }, 
+            _pointUp: function(){
+                this.x = field.w / 2
+                this.y = field.h / 2
+            },         
             _move: function(){
-                this.x += 1 * this.speed,
-                this.y += 1 * this.speed
+                this.x += this.directionX * this.speed,
+                this.y += this.directionY * this.speed
             },
             draw: function(){
                 canvasCtx.fillStyle = "#ffffff"
@@ -105,6 +158,7 @@
                 canvasCtx.arc(this.x, this.y, this.r, 0, 2 * Math.PI, false)
                 canvasCtx.fill()
 
+                this._calcPosition()
                 this._move()
             }
         }
